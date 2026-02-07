@@ -11,7 +11,7 @@ const Settings = () => {
     username: 'DragonTrader99',
     email: 'dragon@example.com',
     robloxUsername: 'DragonTrader99_RBX',
-    bio: 'Experienced trader specializing in high-tier dragons. Always fair and honest!'
+    bio: 'Experienced seller specializing in high-tier dragons. Always fair and honest!'
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -21,7 +21,7 @@ const Settings = () => {
   });
 
   const [notificationSettings, setNotificationSettings] = useState({
-    tradeOffers: true,
+    newOrders: true,
     messages: true,
     priceAlerts: false,
     newsletter: true,
@@ -31,7 +31,7 @@ const Settings = () => {
 
   const [privacySettings, setPrivacySettings] = useState({
     showOnlineStatus: true,
-    showTradeHistory: true,
+    showSalesHistory: true,
     allowMessages: 'everyone', // everyone, verified, none
     showEmail: false
   });
@@ -424,7 +424,7 @@ const Settings = () => {
                     <h3 className="text-lg font-medium text-white mb-4">Email Notifications</h3>
                     <div className="space-y-3">
                       {[
-                        { key: 'tradeOffers', label: 'Trade Offers', desc: 'Get notified when someone makes you a trade offer' },
+                        { key: 'newOrders', label: 'New Orders', desc: 'Get notified when someone purchases your listing' },
                         { key: 'messages', label: 'Direct Messages', desc: 'Receive emails for new messages' },
                         { key: 'priceAlerts', label: 'Price Alerts', desc: 'Get notified of significant price changes' },
                         { key: 'newsletter', label: 'Newsletter', desc: 'Weekly updates and marketplace news' }
@@ -489,7 +489,7 @@ const Settings = () => {
                   <div className="space-y-3">
                     {[
                       { key: 'showOnlineStatus', label: 'Show Online Status', desc: 'Let others see when you\'re online' },
-                      { key: 'showTradeHistory', label: 'Public Trade History', desc: 'Allow others to view your trade history' },
+                      { key: 'showSalesHistory', label: 'Public Sales History', desc: 'Allow others to view your sales history' },
                       { key: 'showEmail', label: 'Show Email', desc: 'Display your email on your profile' }
                     ].map(({ key, label, desc }) => (
                       <label key={key} className="flex items-center justify-between p-4 bg-dark-900 rounded-lg cursor-pointer hover:bg-dark-800 transition-colors">
