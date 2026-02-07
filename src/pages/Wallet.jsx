@@ -1,0 +1,234 @@
+import { useState } from 'react';
+import { DollarSign, TrendingUp, TrendingDown, ArrowDownCircle, ArrowUpCircle, Lock } from 'lucide-react';
+import Badge from '../components/Badge';
+
+const Wallet = () => {
+  const [depositAmount, setDepositAmount] = useState('');
+
+  // Mock data
+  const balance = {
+    available: 250.00,
+    frozen: 150.00, // Money in escrow
+    total: 400.00,
+  };
+
+  const transactions = [
+    {
+      id: 1,
+      type: 'PURCHASE',
+      amount: -150.00,
+      description: 'Purchase: Shadow Dragon (FR)',
+      balanceAfter: 250.00,
+      createdAt: '2024-02-07T10:30:00Z',
+    },
+    {
+      id: 2,
+      type: 'SALE_EARNING',
+      amount: 93.00,
+      description: 'Sale: Parrot (FR) - Platform fee: $7.00',
+      balanceAfter: 400.00,
+      createdAt: '2024-02-06T14:20:00Z',
+    },
+    {
+      id: 3,
+      type: 'DEPOSIT',
+      amount: 500.00,
+      description: 'Deposit via Stripe',
+      balanceAfter: 307.00,
+      createdAt: '2024-02-05T09:15:00Z',
+    },
+    {
+      id: 4,
+      type: 'ESCROW_HOLD',
+      amount: -100.00,
+      description: 'Escrow hold for order #12345',
+      balanceAfter: -193.00,
+      createdAt: '2024-02-04T16:45:00Z',
+    },
+    {
+      id: 5,
+      type: 'ESCROW_RELEASE',
+      amount: -100.00,
+      description: 'Escrow released for order #12344',
+      balanceAfter: -93.00,
+      createdAt: '2024-02-04T18:30:00Z',
+    },
+  ];
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getTransactionIcon = (type) => {
+    switch (type) {
+      case 'DEPOSIT':
+        return <ArrowDownCircle className="w-5 h-5 text-green-500" />;
+      case 'WITHDRAWAL':
+        return <ArrowUpCircle className="w-5 h-5 text-red-500" />;
+      case 'PURCHASE':
+      case 'ESCROW_HOLD':
+        return <TrendingDown className="w-5 h-5 text-red-500" />;
+      case 'SALE_EARNING':
+      case 'ESCROW_RELEASE':
+      case 'REFUND':
+        return <TrendingUp className="w-5 h-5 text-green-500" />;
+      default:
+        return <DollarSign className="w-5 h-5 text-gray-500" />;
+    }
+  };
+
+  const getTransactionColor = (amount) => {
+    return amount >= 0 ? 'text-green-500' : 'text-red-500';
+  };
+
+  const handleDeposit = (e) => {
+    e.preventDefault();
+    console.log('Deposit amount:', depositAmount);
+    // API call would go here
+    setDepositAmount('');
+  };
+
+  return (
+    <div className="min-h-screen bg-dark-950 py-8">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">Wallet</h1>
+          <p className="text-gray-400">Manage your balance and view transaction history</p>
+        </div>
+
+        {/* Balance Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Available Balance */}
+          <div className="card p-6 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-gray-400">Available Balance</h3>
+              <DollarSign className="w-5 h-5 text-primary" />
+            </div>
+            <p className="text-3xl font-bold text-white">${balance.available.toFixed(2)}</p>
+            <p className="text-xs text-gray-500 mt-1">Ready to spend</p>
+          </div>
+
+          {/* Frozen/Escrow Balance */}
+          <div className="card p-6 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-gray-400">In Escrow</h3>
+              <Lock className="w-5 h-5 text-yellow-500" />
+            </div>
+            <p className="text-3xl font-bold text-white">${balance.frozen.toFixed(2)}</p>
+            <p className="text-xs text-gray-500 mt-1">Held for pending orders</p>
+          </div>
+
+          {/* Total Balance */}
+          <div className="card p-6 bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-gray-400">Total Balance</h3>
+              <TrendingUp className="w-5 h-5 text-green-500" />
+            </div>
+            <p className="text-3xl font-bold text-white">${balance.total.toFixed(2)}</p>
+            <p className="text-xs text-gray-500 mt-1">Available + Escrow</p>
+          </div>
+        </div>
+
+        {/* Deposit/Withdraw Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Deposit */}
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Deposit Funds</h3>
+            <form onSubmit={handleDeposit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Amount (USD)
+                </label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="input pl-10"
+                  />
+                </div>
+              </div>
+              <button type="submit" className="btn-primary w-full">
+                <ArrowDownCircle className="w-4 h-4 mr-2" />
+                Deposit via Stripe (Coming Soon)
+              </button>
+              <button type="button" className="btn-secondary w-full">
+                Deposit via Crypto (Coming Soon)
+              </button>
+            </form>
+          </div>
+
+          {/* Withdraw */}
+          <div className="card p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Withdraw Funds</h3>
+            <div className="bg-dark-850 border border-dark-700 rounded-lg p-4 mb-4">
+              <p className="text-sm text-gray-400 mb-2">Available to withdraw:</p>
+              <p className="text-2xl font-bold text-primary">${balance.available.toFixed(2)}</p>
+            </div>
+            <button className="btn-secondary w-full" disabled>
+              <ArrowUpCircle className="w-4 h-4 mr-2" />
+              Withdraw (Coming Soon)
+            </button>
+            <p className="text-xs text-gray-500 mt-3 text-center">
+              Minimum withdrawal: $10.00
+            </p>
+          </div>
+        </div>
+
+        {/* Transaction History */}
+        <div className="card p-6">
+          <h3 className="text-lg font-semibold text-white mb-6">Transaction History</h3>
+          
+          {transactions.length === 0 ? (
+            <div className="text-center py-12">
+              <DollarSign className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-400">No transactions yet</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {transactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-4 bg-dark-850 border border-dark-700 rounded-lg hover:border-primary/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-dark-900 rounded-full flex items-center justify-center">
+                      {getTransactionIcon(transaction.type)}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{transaction.description}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formatDate(transaction.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-lg font-semibold ${getTransactionColor(transaction.amount)}`}>
+                      {transaction.amount >= 0 ? '+' : ''}${Math.abs(transaction.amount).toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Balance: ${transaction.balanceAfter.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Wallet;
