@@ -129,13 +129,6 @@ const Wallet = () => {
     return amount >= 0 ? 'text-green-500' : 'text-red-500';
   };
 
-  const handleDeposit = (e) => {
-    e.preventDefault();
-    console.log('Deposit amount:', depositAmount);
-    // API call would go here
-    setDepositAmount('');
-  };
-
   return (
     <div className="min-h-screen bg-dark-950 py-8">
       <div className="container mx-auto px-4 max-w-6xl">

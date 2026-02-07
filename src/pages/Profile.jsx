@@ -48,7 +48,6 @@ const Profile = () => {
   }
 
   if (error || !user) {
-  if (error || !user) {
     return (
       <div className="min-h-screen bg-dark-950 flex items-center justify-center">
         <div className="card p-8 text-center">
@@ -208,48 +207,9 @@ const Profile = () => {
 
         {activeTab === 'history' && (
           <div className="space-y-4">
-            {mockTrades.length === 0 ? (
-              <div className="card p-12 text-center">
-                <p className="text-gray-400">No sales history</p>
-              </div>
-            ) : (
-              mockTrades.map(trade => (
-                <div key={trade.id} className="card p-6">
-                  <div className="flex flex-col sm:flex-row justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-3">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        <span className="text-sm text-gray-400">
-                          {formatDate(trade.date)}
-                        </span>
-                      </div>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                            Gave
-                          </p>
-                          <p className="text-white font-medium">{trade.gave}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                            Received
-                          </p>
-                          <p className="text-white font-medium">{trade.received}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <Link
-                        to={`/profile/${trade.partner}`}
-                        className="text-primary hover:underline"
-                      >
-                        {trade.partner}
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+            <div className="card p-12 text-center">
+              <p className="text-gray-400">No sales history</p>
+            </div>
           </div>
         )}
 

@@ -75,7 +75,6 @@ const ListingDetail = () => {
   }
 
   if (error || !listing) {
-  if (error || !listing) {
     return (
       <div className="min-h-screen bg-dark-950 flex items-center justify-center">
         <div className="card p-8 text-center">
@@ -302,35 +301,36 @@ const ListingDetail = () => {
         </div>
 
         {/* Buy Confirmation Modal */}
-        {showBuyModal && (
-          <Modal onClose={() => setShowBuyModal(false)}>
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Confirm Purchase</h3>
-              <p className="text-gray-400 mb-4">
-                Are you sure you want to buy <span className="text-white font-semibold">{listing.petName}</span> for{' '}
-                <span className="text-primary font-semibold">${listing.price.toFixed(2)}</span>?
-              </p>
-              <p className="text-sm text-gray-500 mb-6">
-                Funds will be held in escrow until you confirm delivery.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleBuyNow}
-                  disabled={isBuying}
-                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isBuying ? 'Processing...' : 'Confirm Purchase'}
-                </button>
-                <button
-                  onClick={() => setShowBuyModal(false)}
-                  className="flex-1 btn-secondary"
-                >
-                  Cancel
-                </button>
-              </div>
+        <Modal
+          isOpen={showBuyModal}
+          onClose={() => setShowBuyModal(false)}
+          title="Confirm Purchase"
+        >
+          <div className="p-6">
+            <p className="text-gray-400 mb-4">
+              Are you sure you want to buy <span className="text-white font-semibold">{listing.petName}</span> for{' '}
+              <span className="text-primary font-semibold">${listing.price.toFixed(2)}</span>?
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              Funds will be held in escrow until you confirm delivery.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBuyNow}
+                disabled={isBuying}
+                className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isBuying ? 'Processing...' : 'Confirm Purchase'}
+              </button>
+              <button
+                onClick={() => setShowBuyModal(false)}
+                className="flex-1 btn-secondary"
+              >
+                Cancel
+              </button>
             </div>
-          </Modal>
-        )}
+          </div>
+        </Modal>
       </div>
     </div>
   );

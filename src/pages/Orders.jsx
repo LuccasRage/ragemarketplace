@@ -57,7 +57,6 @@ const Orders = () => {
 
   const purchases = orders.filter(o => o.type === 'BUY' || !o.isSeller);
   const sales = orders.filter(o => o.type === 'SELL' || o.isSeller);
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
