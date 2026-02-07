@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -31,6 +31,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/trades" element={<Navigate to="/orders" replace />} />
             <Route path="/wallet" element={<Wallet />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/values" element={<Values />} />

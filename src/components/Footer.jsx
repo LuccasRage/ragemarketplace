@@ -9,12 +9,12 @@ const Footer = () => {
       { label: 'Browse Listings', to: '/listings' },
       { label: 'Create Listing', to: '/create' },
       { label: 'Value Guide', to: '/values' },
-      { label: 'My Trades', to: '/trades' },
+      { label: 'My Orders', to: '/orders' },
     ],
     support: [
       { label: 'Report Scam', to: '/reports' },
       { label: 'Help Center', to: '#' },
-      { label: 'Trading Tips', to: '#' },
+      { label: 'Safety Tips', to: '#' },
       { label: 'Safety Guide', to: '#' },
     ],
     legal: [
@@ -47,7 +47,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-gray-400 text-sm mb-4 max-w-xs">
-              The trusted marketplace for Roblox Adopt Me pet trading. Connect with traders, find fair deals, and build your dream collection.
+              The trusted marketplace for Roblox Adopt Me pet buying and selling. Connect with users, find fair deals, and build your dream collection.
             </p>
             <div className="flex space-x-3">
               {socialLinks.map((social) => (

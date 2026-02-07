@@ -15,7 +15,7 @@ const Reports = () => {
   const mockReports = [
     {
       id: 1,
-      reportedUser: 'SuspiciousTrader123',
+      reportedUser: 'SuspiciousUser123',
       reportedBy: 'DragonTrader99',
       type: 'scam',
       description: 'User tried to scam me by switching pets at last moment',
@@ -25,7 +25,7 @@ const Reports = () => {
     },
     {
       id: 2,
-      reportedUser: 'FakeTrader456',
+      reportedUser: 'FakeUser456',
       reportedBy: 'SafariHunter',
       type: 'fake_middleman',
       description: 'Pretended to be a middleman and stole my pet',
@@ -38,7 +38,7 @@ const Reports = () => {
       reportedUser: 'RudeUser789',
       reportedBy: 'ParrotLover',
       type: 'harassment',
-      description: 'Sending harassing messages after declining trade',
+      description: 'Sending harassing messages after declining offer',
       date: '2024-02-05T16:45:00Z',
       status: 'investigating',
       evidence: 'Message screenshots'

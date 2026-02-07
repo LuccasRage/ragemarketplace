@@ -52,6 +52,12 @@ const ListingDetail = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Main Image */}
             <div className="card p-6">
+              {/* Price Display */}
+              <div className="mb-4 p-4 bg-dark-900 rounded-lg border-2 border-primary">
+                <p className="text-sm text-gray-400 mb-1">Price</p>
+                <p className="text-4xl font-bold text-primary">${listing.price ? listing.price.toFixed(2) : '0.00'}</p>
+              </div>
+
               <div className="relative aspect-square bg-gradient-to-br from-dark-800 to-dark-850 rounded-lg overflow-hidden mb-4">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
@@ -73,7 +79,7 @@ const ListingDetail = () => {
               <div className="flex gap-3">
                 <button className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2">
                   <MessageCircle className="w-5 h-5" />
-                  Contact Seller
+                  Buy Now
                 </button>
                 <button className="px-4 py-3 bg-dark-900 text-gray-400 hover:text-white rounded-lg transition-colors">
                   <Heart className="w-5 h-5" />
@@ -84,6 +90,13 @@ const ListingDetail = () => {
                 <button className="px-4 py-3 bg-dark-900 text-gray-400 hover:text-primary rounded-lg transition-colors">
                   <Flag className="w-5 h-5" />
                 </button>
+              </div>
+
+              {/* Escrow Info */}
+              <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <p className="text-sm text-green-400 flex items-center gap-2">
+                  💰 Funds held securely in escrow until you confirm delivery
+                </p>
               </div>
             </div>
 
@@ -102,9 +115,9 @@ const ListingDetail = () => {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">
-                    Wants in Return
+                    Description
                   </p>
-                  <p className="text-lg text-white">{listing.wantInReturn}</p>
+                  <p className="text-lg text-white">{listing.description || 'No description provided.'}</p>
                 </div>
 
                 <div className="flex items-center gap-6 text-sm text-gray-400">
@@ -189,7 +202,7 @@ const ListingDetail = () => {
                       <span className="text-white">{seller.activeListings}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Completed Trades</span>
+                      <span className="text-gray-400">Completed Sales</span>
                       <span className="text-white">{seller.completedTrades}</span>
                     </div>
                     <div className="flex justify-between">
@@ -218,15 +231,15 @@ const ListingDetail = () => {
 
             {/* Trading Tips */}
             <div className="card p-6">
-              <h2 className="text-lg font-bold text-white mb-4">Trading Tips</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Safety Tips</h2>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li className="flex gap-2">
                   <span className="text-primary">•</span>
-                  <span>Always use middleman for high-value trades</span>
+                  <span>Funds are held in escrow for your protection</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-primary">•</span>
-                  <span>Check trader's reputation before trading</span>
+                  <span>Check seller's reputation and reviews before buying</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-primary">•</span>

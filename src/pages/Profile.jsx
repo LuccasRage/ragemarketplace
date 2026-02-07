@@ -109,7 +109,7 @@ const Profile = () => {
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-white">{user.completedTrades}</p>
-                  <p className="text-sm text-gray-400">Completed Trades</p>
+                  <p className="text-sm text-gray-400">Completed Sales</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-white">{user.reputation}</p>
@@ -161,7 +161,7 @@ const Profile = () => {
                   : 'text-gray-400 hover:text-white hover:bg-dark-800'
               }`}
             >
-              Trade History
+              Sales History
             </button>
             <button
               onClick={() => setActiveTab('reviews')}
@@ -197,7 +197,7 @@ const Profile = () => {
           <div className="space-y-4">
             {mockTrades.length === 0 ? (
               <div className="card p-12 text-center">
-                <p className="text-gray-400">No trade history</p>
+                <p className="text-gray-400">No sales history</p>
               </div>
             ) : (
               mockTrades.map(trade => (

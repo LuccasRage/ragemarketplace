@@ -62,8 +62,8 @@ const ItemCard = ({ listing }) => {
 
         {/* Want in Return */}
         <div className="bg-dark-850 rounded-lg p-2">
-          <p className="text-xs text-gray-500 mb-1">Looking for:</p>
-          <p className="text-sm text-gray-300 line-clamp-2">{listing.wantInReturn}</p>
+          <p className="text-xs text-gray-500 mb-1">Price:</p>
+          <p className="text-lg font-bold text-primary">${listing.price ? listing.price.toFixed(2) : '0.00'}</p>
         </div>
 
         {/* User Info */}

@@ -9,27 +9,27 @@ const Home = () => {
   const stats = [
     { icon: TrendingUp, label: 'Total Sales', value: '50,000+' },
     { icon: Users, label: 'Active Users', value: '10,000+' },
-    { icon: Shield, label: 'Safe Transactions', value: '99.9%' },
+    { icon: Shield, label: 'Secure Transactions', value: '99.9%' },
     { icon: Zap, label: 'Avg Response', value: '< 5min' },
   ];
 
   const howItWorks = [
     {
       step: 1,
-      title: 'Browse & Buy',
-      description: 'Browse listings and purchase pets securely with our escrow system',
+      title: 'List Your Pet',
+      description: 'Set your price and list your pet for sale on our secure marketplace',
       icon: '🔍',
     },
     {
       step: 2,
-      title: 'Seller Delivers In-Game',
-      description: 'Sellers deliver your pet in Adopt Me while funds are held safely in escrow',
+      title: 'Secure Purchase',
+      description: 'Buyer pays, funds held in escrow for your protection during delivery',
       icon: '🎮',
     },
     {
       step: 3,
-      title: 'Confirm & Complete',
-      description: 'Confirm receipt to release payment to seller. Protected by our 7% platform fee',
+      title: 'Deliver & Get Paid',
+      description: 'Deliver in-game, get 93% after 7% platform fee once buyer confirms receipt',
       icon: '✅',
     },
   ];
@@ -45,7 +45,7 @@ const Home = () => {
 
         <div className="relative max-w-7xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-            Trade Smarter. Trade{' '}
+            Buy Smarter. Sell{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-600">
               Safer.
             </span>
@@ -62,7 +62,7 @@ const Home = () => {
               to="/create"
               className="px-8 py-4 bg-dark-850 hover:bg-dark-800 text-white font-semibold rounded-lg border-2 border-dark-700 hover:border-primary transition-all duration-200 flex items-center justify-center"
             >
-              Sell Your Pets
+              Start Selling
             </Link>
           </div>
         </div>
@@ -91,7 +91,7 @@ const Home = () => {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-bold text-white mb-2">Featured Listings</h2>
-              <p className="text-gray-400">Check out the latest pet trades</p>
+              <p className="text-gray-400">Check out the latest listings for sale</p>
             </div>
             <Link
               to="/listings"
@@ -115,7 +115,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-2">How It Works</h2>
-            <p className="text-gray-400">Start trading in three simple steps</p>
+            <p className="text-gray-400">Start buying and selling in three simple steps</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -138,19 +138,19 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-2">Why Choose RageMarketplace?</h2>
-            <p className="text-gray-400">The safest and most reliable trading platform</p>
+            <p className="text-gray-400">The safest and most reliable marketplace platform</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                title: 'Verified Traders',
-                description: 'All users go through verification to ensure legitimate trading',
+                title: 'Verified Sellers',
+                description: 'All users go through verification to ensure legitimate transactions',
                 icon: Shield,
               },
               {
                 title: 'User Reputation',
-                description: 'Rating system helps you trade with confidence',
+                description: 'Rating system helps you buy and sell with confidence',
                 icon: Users,
               },
               {
@@ -160,17 +160,17 @@ const Home = () => {
               },
               {
                 title: 'Value Guide',
-                description: 'Up-to-date pet values to help you make fair trades',
+                description: 'Up-to-date pet values to help you make fair deals',
                 icon: TrendingUp,
               },
               {
-                title: 'Fast Matching',
-                description: 'Find the perfect trade quickly with our search filters',
+                title: 'Fast Transactions',
+                description: 'Find the perfect pet quickly with our search filters',
                 icon: Zap,
               },
               {
-                title: 'No Bot Trading',
-                description: 'Real players only - meet in-game to complete trades',
+                title: 'Escrow Protection',
+                description: 'Secure payments - funds held safely until delivery confirmed',
                 icon: Users,
               },
             ].map((feature, index) => (
@@ -187,16 +187,16 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Trading?</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Buying and Selling?</h2>
           <p className="text-xl text-gray-400 mb-8">
-            Join thousands of traders and find your dream pets today
+            Join thousands of users and find your dream pets today
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/register" className="btn-primary">
               Create Account
             </Link>
             <Link to="/listings" className="btn-secondary">
-              Browse Listings
+              Browse Marketplace
             </Link>
           </div>
         </div>
