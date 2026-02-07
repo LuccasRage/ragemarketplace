@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Grid3x3, List } from 'lucide-react';
 import ItemCard from '../components/ItemCard';
 import FilterSidebar from '../components/FilterSidebar';
-import { mockListings } from '../data/mockListings';
+import { listingsAPI } from '../services/api';
 
 const Listings = () => {
   const [viewMode, setViewMode] = useState('grid');
@@ -14,10 +14,32 @@ const Listings = () => {
     rarity: 'All',
     search: ''
   });
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const itemsPerPage = 12;
 
-  const filteredListings = mockListings.filter(listing => {
+  // Fetch listings from API
+  useEffect(() => {
+    const fetchListings = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await listingsAPI.getAll();
+        setListings(response.data);
+      } catch (err) {
+        console.error('Failed to fetch listings:', err);
+        setError('Failed to load listings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  const filteredListings = listings.filter(listing => {
     if (filters.category !== 'All' && listing.category !== filters.category) return false;
     if (filters.age !== 'All' && listing.age !== filters.age) return false;
     if (filters.potion !== 'All' && listing.potion !== filters.potion) return false;
@@ -76,7 +98,16 @@ const Listings = () => {
             </div>
 
             {/* Listings Grid/List */}
-            {displayedListings.length === 0 ? (
+            {isLoading ? (
+              <div className="card p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+                <p className="text-gray-400 mt-4">Loading listings...</p>
+              </div>
+            ) : error ? (
+              <div className="card p-12 text-center">
+                <p className="text-red-400 text-lg">{error}</p>
+              </div>
+            ) : displayedListings.length === 0 ? (
               <div className="card p-12 text-center">
                 <p className="text-gray-400 text-lg">No listings found matching your filters</p>
               </div>

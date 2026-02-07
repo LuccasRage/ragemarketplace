@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, GamepadIcon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,6 +17,7 @@ const Register = () => {
     agreeToTerms: false
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -60,12 +63,19 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Register:', formData);
-      navigate('/');
+      setIsLoading(true);
+      const result = await register(formData.username, formData.email, formData.password);
+      setIsLoading(false);
+      
+      if (result.success) {
+        navigate('/');
+      } else {
+        setErrors({ general: result.error });
+      }
     }
   };
 
@@ -123,6 +133,12 @@ const Register = () => {
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errors.general && (
+              <div className="p-3 bg-primary/10 border border-primary rounded-lg text-primary text-sm">
+                {errors.general}
+              </div>
+            )}
+            
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Username
@@ -277,9 +293,10 @@ const Register = () => {
 
             <button
               type="submit"
-              className="w-full px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              disabled={isLoading}
+              className="w-full px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 

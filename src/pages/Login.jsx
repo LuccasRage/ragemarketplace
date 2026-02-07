@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,12 +41,19 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Login:', formData);
-      navigate('/');
+      setIsLoading(true);
+      const result = await login(formData.email, formData.password);
+      setIsLoading(false);
+      
+      if (result.success) {
+        navigate('/');
+      } else {
+        setErrors({ general: result.error });
+      }
     }
   };
 
@@ -101,6 +111,12 @@ const Login = () => {
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errors.general && (
+              <div className="p-3 bg-primary/10 border border-primary rounded-lg text-primary text-sm">
+                {errors.general}
+              </div>
+            )}
+            
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email Address
@@ -174,9 +190,10 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              disabled={isLoading}
+              className="w-full px-4 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
