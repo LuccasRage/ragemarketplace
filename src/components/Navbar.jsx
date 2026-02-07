@@ -1,15 +1,20 @@
 import { Link, NavLink } from 'react-router-dom';
 import { Search, Menu, X, User, LogOut, Settings, Package } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Mock auth state - would come from context/state management in real app
-  const isLoggedIn = true;
-  const currentUser = { username: "DragonTrader99", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=DragonTrader99" };
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileOpen(false);
+    setIsMobileMenuOpen(false);
+  };
 
   const navLinks = [
     { to: '/', label: 'Home' },
@@ -67,13 +72,13 @@ const Navbar = () => {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center space-x-4">
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/wallet"
                   className="px-4 py-2 bg-dark-850 border border-dark-700 rounded-lg text-sm font-medium text-primary hover:bg-dark-800 transition-colors"
                 >
-                  💰 $250.00
+                  💰 ${user?.balance?.toFixed(2) || '0.00'}
                 </Link>
                 <Link
                   to="/create"
@@ -87,8 +92,8 @@ const Navbar = () => {
                     className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                   >
                     <img
-                      src={currentUser.avatar}
-                      alt={currentUser.username}
+                      src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`}
+                      alt={user?.username}
                       className="w-8 h-8 rounded-full border-2 border-primary"
                     />
                   </button>
@@ -96,7 +101,7 @@ const Navbar = () => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-dark-850 border border-dark-700 rounded-lg shadow-xl py-2">
                       <Link
-                        to={`/profile/${currentUser.username}`}
+                        to={`/profile/${user?.username}`}
                         className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                       >
@@ -120,7 +125,10 @@ const Navbar = () => {
                         <span className="text-sm">Settings</span>
                       </Link>
                       <hr className="my-2 border-dark-700" />
-                      <button className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors w-full text-left text-red-400">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors w-full text-left text-red-400"
+                      >
                         <LogOut className="w-4 h-4" />
                         <span className="text-sm">Logout</span>
                       </button>
@@ -129,9 +137,14 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <Link to="/login" className="btn-primary text-sm">
-                Login
-              </Link>
+              <>
+                <Link to="/login" className="btn-secondary text-sm">
+                  Login
+                </Link>
+                <Link to="/register" className="btn-primary text-sm">
+                  Sign Up
+                </Link>
+              </>
             )}
           </div>
 
@@ -183,14 +196,14 @@ const Navbar = () => {
               </NavLink>
             ))}
 
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/wallet"
                   className="block px-4 py-2 bg-dark-850 border border-dark-700 text-primary text-center font-medium rounded-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  💰 $250.00
+                  💰 ${user?.balance?.toFixed(2) || '0.00'}
                 </Link>
                 <Link
                   to="/create"
@@ -200,7 +213,7 @@ const Navbar = () => {
                   Sell
                 </Link>
                 <Link
-                  to={`/profile/${currentUser.username}`}
+                  to={`/profile/${user?.username}`}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg text-sm"
                 >
@@ -213,18 +226,30 @@ const Navbar = () => {
                 >
                   Settings
                 </Link>
-                <button className="block w-full text-left px-4 py-2 text-red-400 hover:bg-dark-850 rounded-lg text-sm">
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-red-400 hover:bg-dark-850 rounded-lg text-sm"
+                >
                   Logout
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-4 py-2 bg-primary hover:bg-primary-600 text-white text-center font-medium rounded-lg transition-colors"
-              >
-                Login
-              </Link>
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-2 bg-dark-850 hover:bg-dark-800 text-white text-center font-medium rounded-lg transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-2 bg-primary hover:bg-primary-600 text-white text-center font-medium rounded-lg transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
           </div>
         </div>

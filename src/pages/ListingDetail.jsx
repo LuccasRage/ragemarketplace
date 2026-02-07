@@ -1,21 +1,85 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Eye, Heart, Clock, MessageCircle, Flag, Share2, ArrowLeft } from 'lucide-react';
 import Badge from '../components/Badge';
 import StarRating from '../components/StarRating';
-import { mockListings } from '../data/mockListings';
-import { mockUsers } from '../data/mockUsers';
+import { listingsAPI, ordersAPI, usersAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import Modal from '../components/Modal';
 
 const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const listing = mockListings.find(l => l.id === parseInt(id));
+  const { user, isAuthenticated } = useAuth();
+  const [listing, setListing] = useState(null);
+  const [seller, setSeller] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isBuying, setIsBuying] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
 
-  if (!listing) {
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        const response = await listingsAPI.getById(id);
+        setListing(response.data);
+        
+        // Fetch seller info
+        if (response.data.userId) {
+          const sellerResponse = await usersAPI.getById(response.data.userId);
+          setSeller(sellerResponse.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch listing:', err);
+        setError('Failed to load listing');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchListing();
+  }, [id]);
+
+  const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (!user || user.balance < listing.price) {
+      alert('Insufficient balance. Please add funds to your wallet.');
+      navigate('/wallet');
+      return;
+    }
+
+    setIsBuying(true);
+    try {
+      await ordersAPI.buyItem(listing.id);
+      alert('Purchase successful! Check your orders page.');
+      navigate('/orders');
+    } catch (err) {
+      console.error('Failed to buy item:', err);
+      alert(err.response?.data?.message || 'Failed to complete purchase');
+    } finally {
+      setIsBuying(false);
+      setShowBuyModal(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !listing) {
     return (
       <div className="min-h-screen bg-dark-950 flex items-center justify-center">
         <div className="card p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Listing Not Found</h2>
-          <p className="text-gray-400 mb-6">The listing you're looking for doesn't exist.</p>
+          <p className="text-gray-400 mb-6">{error || "The listing you're looking for doesn't exist."}</p>
           <Link to="/listings" className="btn-primary">
             Back to Listings
           </Link>
@@ -33,7 +97,7 @@ const ListingDetail = () => {
     });
   };
 
-  const seller = mockUsers.find(u => u.id === listing.userId);
+  const isOwnListing = user && seller && user.id === seller.id;
 
   return (
     <div className="min-h-screen bg-dark-950 py-8">
@@ -77,9 +141,13 @@ const ListingDetail = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <button className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setShowBuyModal(true)}
+                  disabled={isBuying || isOwnListing}
+                  className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <MessageCircle className="w-5 h-5" />
-                  Buy Now
+                  {isOwnListing ? 'Your Listing' : isBuying ? 'Processing...' : 'Buy Now'}
                 </button>
                 <button className="px-4 py-3 bg-dark-900 text-gray-400 hover:text-white rounded-lg transition-colors">
                   <Heart className="w-5 h-5" />
@@ -138,29 +206,7 @@ const ListingDetail = () => {
             </div>
 
             {/* Similar Listings */}
-            <div className="card p-6">
-              <h2 className="text-xl font-bold text-white mb-4">Similar Listings</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {mockListings
-                  .filter(l => l.category === listing.category && l.id !== listing.id)
-                  .slice(0, 3)
-                  .map(similar => (
-                    <Link
-                      key={similar.id}
-                      to={`/listing/${similar.id}`}
-                      className="group"
-                    >
-                      <div className="aspect-square bg-gradient-to-br from-dark-800 to-dark-850 rounded-lg flex items-center justify-center mb-2 group-hover:ring-2 group-hover:ring-primary transition-all">
-                        <span className="text-4xl">🐾</span>
-                      </div>
-                      <p className="text-sm text-white font-medium truncate">
-                        {similar.petName}
-                      </p>
-                      <p className="text-xs text-gray-500">{similar.category}</p>
-                    </Link>
-                  ))}
-              </div>
-            </div>
+            {/* Removed similar listings section for now */}
           </div>
 
           {/* Right Column - Seller Info */}
@@ -253,6 +299,38 @@ const ListingDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Buy Confirmation Modal */}
+        <Modal
+          isOpen={showBuyModal}
+          onClose={() => setShowBuyModal(false)}
+          title="Confirm Purchase"
+        >
+          <div className="p-6">
+            <p className="text-gray-400 mb-4">
+              Are you sure you want to buy <span className="text-white font-semibold">{listing.petName}</span> for{' '}
+              <span className="text-primary font-semibold">${listing.price.toFixed(2)}</span>?
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              Funds will be held in escrow until you confirm delivery.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBuyNow}
+                disabled={isBuying}
+                className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isBuying ? 'Processing...' : 'Confirm Purchase'}
+              </button>
+              <button
+                onClick={() => setShowBuyModal(false)}
+                className="flex-1 btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </div>
   );

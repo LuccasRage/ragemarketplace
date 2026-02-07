@@ -1,10 +1,29 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { ArrowRight, Shield, Users, TrendingUp, Zap, CheckCircle } from 'lucide-react';
 import ItemCard from '../components/ItemCard';
-import { mockListings } from '../data/mockListings';
+import { listingsAPI } from '../services/api';
 
 const Home = () => {
-  const featuredListings = mockListings.slice(0, 6);
+  const [featuredListings, setFeaturedListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFeaturedListings = async () => {
+      try {
+        const response = await listingsAPI.getAll({ limit: 6 });
+        setFeaturedListings(response.data.slice(0, 6));
+      } catch (err) {
+        console.error('Failed to fetch listings:', err);
+        setError('Failed to load listings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFeaturedListings();
+  }, []);
 
   const stats = [
     { icon: TrendingUp, label: 'Total Sales', value: '50,000+' },
@@ -103,9 +122,24 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredListings.map((listing) => (
-              <ItemCard key={listing.id} listing={listing} />
-            ))}
+            {isLoading ? (
+              <div className="col-span-full text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+                <p className="text-gray-400 mt-4">Loading listings...</p>
+              </div>
+            ) : error ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-red-400">{error}</p>
+              </div>
+            ) : featuredListings.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-400">No listings available at the moment</p>
+              </div>
+            ) : (
+              featuredListings.map((listing) => (
+                <ItemCard key={listing.id} listing={listing} />
+              ))
+            )}
           </div>
         </div>
       </section>

@@ -1,59 +1,100 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, ArrowDownCircle, ArrowUpCircle, Lock } from 'lucide-react';
 import Badge from '../components/Badge';
+import { transactionsAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Wallet = () => {
+  const { user, updateUser } = useAuth();
   const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // Mock data
-  const balance = {
-    available: 250.00,
-    frozen: 150.00, // Money in escrow
-    total: 400.00,
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await transactionsAPI.getAll();
+      setTransactions(response.data);
+    } catch (err) {
+      console.error('Failed to fetch transactions:', err);
+      setError('Failed to load transactions');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const transactions = [
-    {
-      id: 1,
-      type: 'PURCHASE',
-      amount: -150.00,
-      description: 'Purchase: Shadow Dragon (FR)',
-      balanceAfter: 250.00,
-      createdAt: '2024-02-07T10:30:00Z',
-    },
-    {
-      id: 2,
-      type: 'SALE_EARNING',
-      amount: 93.00,
-      description: 'Sale: Parrot (FR) - Platform fee: $7.00',
-      balanceAfter: 400.00,
-      createdAt: '2024-02-06T14:20:00Z',
-    },
-    {
-      id: 3,
-      type: 'DEPOSIT',
-      amount: 500.00,
-      description: 'Deposit via Stripe',
-      balanceAfter: 307.00,
-      createdAt: '2024-02-05T09:15:00Z',
-    },
-    {
-      id: 4,
-      type: 'ESCROW_HOLD',
-      amount: -100.00,
-      description: 'Escrow hold for order #12345',
-      balanceAfter: -193.00,
-      createdAt: '2024-02-04T16:45:00Z',
-    },
-    {
-      id: 5,
-      type: 'ESCROW_RELEASE',
-      amount: -100.00,
-      description: 'Escrow released for order #12344',
-      balanceAfter: -93.00,
-      createdAt: '2024-02-04T18:30:00Z',
-    },
-  ];
+  const handleDeposit = async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(depositAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await transactionsAPI.deposit(amount);
+      setDepositAmount('');
+      await fetchTransactions();
+      
+      // Update user balance in context
+      if (user) {
+        updateUser({ ...user, balance: user.balance + amount });
+      }
+      alert('Deposit successful!');
+    } catch (err) {
+      console.error('Failed to deposit:', err);
+      alert(err.response?.data?.message || 'Failed to deposit');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(withdrawAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    if (user && amount > user.balance) {
+      alert('Insufficient balance');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await transactionsAPI.withdraw(amount);
+      setWithdrawAmount('');
+      await fetchTransactions();
+      
+      // Update user balance in context
+      if (user) {
+        updateUser({ ...user, balance: user.balance - amount });
+      }
+      alert('Withdrawal successful!');
+    } catch (err) {
+      console.error('Failed to withdraw:', err);
+      alert(err.response?.data?.message || 'Failed to withdraw');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const balance = {
+    available: user?.balance || 0,
+    frozen: user?.frozenBalance || 0,
+    total: (user?.balance || 0) + (user?.frozenBalance || 0),
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -86,13 +127,6 @@ const Wallet = () => {
 
   const getTransactionColor = (amount) => {
     return amount >= 0 ? 'text-green-500' : 'text-red-500';
-  };
-
-  const handleDeposit = (e) => {
-    e.preventDefault();
-    console.log('Deposit amount:', depositAmount);
-    // API call would go here
-    setDepositAmount('');
   };
 
   return (
@@ -159,12 +193,13 @@ const Wallet = () => {
                   />
                 </div>
               </div>
-              <button type="submit" className="btn-primary w-full">
+              <button
+                type="submit"
+                disabled={actionLoading}
+                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <ArrowDownCircle className="w-4 h-4 mr-2" />
-                Deposit via Stripe (Coming Soon)
-              </button>
-              <button type="button" className="btn-secondary w-full">
-                Deposit via Crypto (Coming Soon)
+                {actionLoading ? 'Processing...' : 'Add Funds'}
               </button>
             </form>
           </div>
@@ -172,14 +207,40 @@ const Wallet = () => {
           {/* Withdraw */}
           <div className="card p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Withdraw Funds</h3>
-            <div className="bg-dark-850 border border-dark-700 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-400 mb-2">Available to withdraw:</p>
-              <p className="text-2xl font-bold text-primary">${balance.available.toFixed(2)}</p>
-            </div>
-            <button className="btn-secondary w-full" disabled>
-              <ArrowUpCircle className="w-4 h-4 mr-2" />
-              Withdraw (Coming Soon)
-            </button>
+            <form onSubmit={handleWithdraw} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Available to withdraw:
+                </label>
+                <p className="text-2xl font-bold text-primary mb-4">${balance.available.toFixed(2)}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Amount (USD)
+                </label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="10"
+                    max={balance.available}
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="input pl-10"
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={actionLoading}
+                className="btn-secondary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ArrowUpCircle className="w-4 h-4 mr-2" />
+                {actionLoading ? 'Processing...' : 'Request Withdrawal'}
+              </button>
+            </form>
             <p className="text-xs text-gray-500 mt-3 text-center">
               Minimum withdrawal: $10.00
             </p>
@@ -190,7 +251,16 @@ const Wallet = () => {
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-white mb-6">Transaction History</h3>
           
-          {transactions.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+              <p className="text-gray-400 mt-4">Loading transactions...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-400">{error}</p>
+            </div>
+          ) : transactions.length === 0 ? (
             <div className="text-center py-12">
               <DollarSign className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-400">No transactions yet</p>

@@ -4,10 +4,12 @@ import { Upload, Eye } from 'lucide-react';
 import Badge from '../components/Badge';
 import StarRating from '../components/StarRating';
 import { categories, ages, potions, rarities } from '../data/mockListings';
+import { listingsAPI } from '../services/api';
 
 const CreateListing = () => {
   const navigate = useNavigate();
   const [showPreview, setShowPreview] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     petName: '',
     category: 'Dragon',
@@ -47,12 +49,29 @@ const CreateListing = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Listing created:', formData);
-      navigate('/listings');
+      setIsSubmitting(true);
+      try {
+        const response = await listingsAPI.create({
+          petName: formData.petName,
+          category: formData.category,
+          age: formData.age,
+          potion: formData.potion,
+          rarity: formData.rarity,
+          price: parseFloat(formData.price),
+          description: formData.description,
+        });
+        
+        navigate(`/listing/${response.data.id}`);
+      } catch (err) {
+        console.error('Failed to create listing:', err);
+        setErrors({ general: err.response?.data?.message || 'Failed to create listing' });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -76,6 +95,12 @@ const CreateListing = () => {
           {/* Form */}
           <div className="card p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {errors.general && (
+                <div className="p-3 bg-primary/10 border border-primary rounded-lg text-primary text-sm">
+                  {errors.general}
+                </div>
+              )}
+              
               {/* Pet Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -256,9 +281,10 @@ const CreateListing = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                  disabled={isSubmitting}
+                  className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Create Listing
+                  {isSubmitting ? 'Creating...' : 'Create Listing'}
                 </button>
               </div>
             </form>
