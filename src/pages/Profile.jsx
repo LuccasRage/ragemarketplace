@@ -1,24 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, CheckCircle, Star, MapPin, Mail, ExternalLink } from 'lucide-react';
 import StarRating from '../components/StarRating';
 import Badge from '../components/Badge';
 import ItemCard from '../components/ItemCard';
-import { mockUsers, mockReviews } from '../data/mockUsers';
-import { mockListings } from '../data/mockListings';
+import { usersAPI, listingsAPI } from '../services/api';
 
 const Profile = () => {
   const { username } = useParams();
   const [activeTab, setActiveTab] = useState('listings');
-  
-  const user = mockUsers.find(u => u.username === username);
+  const [user, setUser] = useState(null);
+  const [userListings, setUserListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!user) {
+  useEffect(() => {
+    fetchUserData();
+  }, [username]);
+
+  const fetchUserData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // In a real app, you'd have an endpoint to fetch user by username
+      // For now, we'll just use mock ID. You might need to adjust this based on your backend
+      const userResponse = await usersAPI.getById(username);
+      setUser(userResponse.data);
+
+      // Fetch user's listings
+      const listingsResponse = await listingsAPI.getAll();
+      const filtered = listingsResponse.data.filter(l => l.userId === userResponse.data.id);
+      setUserListings(filtered);
+    } catch (err) {
+      console.error('Failed to fetch user:', err);
+      setError('Failed to load user profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !user) {
+  if (error || !user) {
     return (
       <div className="min-h-screen bg-dark-950 flex items-center justify-center">
         <div className="card p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">User Not Found</h2>
-          <p className="text-gray-400 mb-6">This user doesn't exist.</p>
+          <p className="text-gray-400 mb-6">{error || "This user doesn't exist."}</p>
           <Link to="/listings" className="btn-primary">
             Back to Listings
           </Link>
@@ -26,28 +61,6 @@ const Profile = () => {
       </div>
     );
   }
-
-  const userListings = mockListings.filter(l => l.userId === user.id);
-  const userReviews = mockReviews.filter(r => r.userId === user.id);
-
-  const mockTrades = [
-    {
-      id: 1,
-      date: '2024-02-05',
-      gave: 'Frost Dragon',
-      received: 'Parrot + Adds',
-      partner: 'DragonTrader99',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      date: '2024-02-03',
-      gave: 'Evil Unicorn',
-      received: 'Crow',
-      partner: 'NightWingTrader',
-      status: 'completed'
-    }
-  ];
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -171,7 +184,7 @@ const Profile = () => {
                   : 'text-gray-400 hover:text-white hover:bg-dark-800'
               }`}
             >
-              Reviews ({userReviews.length})
+              Reviews (0)
             </button>
           </div>
         </div>
@@ -242,40 +255,9 @@ const Profile = () => {
 
         {activeTab === 'reviews' && (
           <div className="space-y-4">
-            {userReviews.length === 0 ? (
-              <div className="card p-12 text-center">
-                <p className="text-gray-400">No reviews yet</p>
-              </div>
-            ) : (
-              userReviews.map(review => (
-                <div key={review.id} className="card p-6">
-                  <div className="flex items-start gap-4">
-                    <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.reviewerUsername}`}
-                      alt={review.reviewerUsername}
-                      className="w-12 h-12 rounded-full ring-2 ring-dark-700"
-                    />
-                    <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                        <Link
-                          to={`/profile/${review.reviewerUsername}`}
-                          className="font-medium text-white hover:text-primary transition-colors"
-                        >
-                          {review.reviewerUsername}
-                        </Link>
-                        <div className="flex items-center gap-2">
-                          <StarRating rating={review.rating} size="sm" />
-                          <span className="text-sm text-gray-500">
-                            {formatDate(review.date)}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-gray-300">{review.comment}</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+            <div className="card p-12 text-center">
+              <p className="text-gray-400">No reviews yet</p>
+            </div>
           </div>
         )}
       </div>
