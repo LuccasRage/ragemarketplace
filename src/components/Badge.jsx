@@ -22,7 +22,7 @@ const Badge = ({ type, value }) => {
         }
         return 'bg-gray-700 text-gray-300';
       
-      case 'age':
+      case 'age': {
         const ageColors = {
           'Newborn': 'bg-red-900/50 text-red-300 border border-red-700',
           'Junior': 'bg-orange-900/50 text-orange-300 border border-orange-700',
@@ -32,6 +32,7 @@ const Badge = ({ type, value }) => {
           'Full Grown': 'bg-purple-900/50 text-purple-300 border border-purple-700',
         };
         return ageColors[value] || 'bg-gray-700 text-gray-300';
+      }
       
       case 'demand':
         if (value === 'High') return 'bg-green-600 text-white';
