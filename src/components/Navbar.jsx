@@ -13,9 +13,9 @@ const Navbar = () => {
 
   const navLinks = [
     { to: '/', label: 'Home' },
-    { to: '/listings', label: 'Listings' },
+    { to: '/listings', label: 'Marketplace' },
     { to: '/values', label: 'Values' },
-    { to: '/trades', label: 'Trades' },
+    { to: '/orders', label: 'Orders' },
   ];
 
   return (
@@ -70,10 +70,16 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link
+                  to="/wallet"
+                  className="px-4 py-2 bg-dark-850 border border-dark-700 rounded-lg text-sm font-medium text-primary hover:bg-dark-800 transition-colors"
+                >
+                  💰 $250.00
+                </Link>
+                <Link
                   to="/create"
                   className="btn-primary text-sm"
                 >
-                  Create Listing
+                  Sell
                 </Link>
                 <div className="relative">
                   <button
@@ -98,12 +104,12 @@ const Navbar = () => {
                         <span className="text-sm">Profile</span>
                       </Link>
                       <Link
-                        to="/trades"
+                        to="/orders"
                         className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <Package className="w-4 h-4" />
-                        <span className="text-sm">My Trades</span>
+                        <span className="text-sm">My Orders</span>
                       </Link>
                       <Link
                         to="/settings"
@@ -180,11 +186,18 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link
+                  to="/wallet"
+                  className="block px-4 py-2 bg-dark-850 border border-dark-700 text-primary text-center font-medium rounded-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  💰 $250.00
+                </Link>
+                <Link
                   to="/create"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block px-4 py-2 bg-primary hover:bg-primary-600 text-white text-center font-medium rounded-lg transition-colors"
                 >
-                  Create Listing
+                  Sell
                 </Link>
                 <Link
                   to={`/profile/${currentUser.username}`}

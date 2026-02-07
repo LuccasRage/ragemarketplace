@@ -10,7 +10,8 @@ import ListingDetail from './pages/ListingDetail';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Trades from './pages/Trades';
+import Orders from './pages/Orders';
+import Wallet from './pages/Wallet';
 import Reports from './pages/Reports';
 import Values from './pages/Values';
 import Settings from './pages/Settings';
@@ -29,7 +30,8 @@ function App() {
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/trades" element={<Trades />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/wallet" element={<Wallet />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/values" element={<Values />} />
             <Route path="/settings" element={<Settings />} />

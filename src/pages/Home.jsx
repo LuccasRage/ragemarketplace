@@ -7,30 +7,30 @@ const Home = () => {
   const featuredListings = mockListings.slice(0, 6);
 
   const stats = [
-    { icon: TrendingUp, label: 'Total Trades', value: '50,000+' },
+    { icon: TrendingUp, label: 'Total Sales', value: '50,000+' },
     { icon: Users, label: 'Active Users', value: '10,000+' },
-    { icon: Shield, label: 'Safe Trades', value: '99.9%' },
+    { icon: Shield, label: 'Safe Transactions', value: '99.9%' },
     { icon: Zap, label: 'Avg Response', value: '< 5min' },
   ];
 
   const howItWorks = [
     {
       step: 1,
-      title: 'List Your Pet',
-      description: 'Create a detailed listing with what you have and what you want in return',
-      icon: '📝',
-    },
-    {
-      step: 2,
-      title: 'Find a Match',
-      description: 'Browse offers or wait for traders to reach out with their proposals',
+      title: 'Browse & Buy',
+      description: 'Browse listings and purchase pets securely with our escrow system',
       icon: '🔍',
     },
     {
+      step: 2,
+      title: 'Seller Delivers In-Game',
+      description: 'Sellers deliver your pet in Adopt Me while funds are held safely in escrow',
+      icon: '🎮',
+    },
+    {
       step: 3,
-      title: 'Trade In-Game',
-      description: 'Meet your trading partner in Adopt Me and complete the trade safely',
-      icon: '🤝',
+      title: 'Confirm & Complete',
+      description: 'Confirm receipt to release payment to seller. Protected by our 7% platform fee',
+      icon: '✅',
     },
   ];
 
@@ -50,17 +50,19 @@ const Home = () => {
               Safer.
             </span>
           </h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
-            The most trusted marketplace for Roblox Adopt Me pet trading. Connect with verified traders, 
-            find fair deals, and build your dream collection.
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            The most trusted marketplace for Roblox Adopt Me pets. Buy and sell with confidence using our secure escrow payment system.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/listings" className="btn-primary flex items-center space-x-2">
-              <span>Browse Listings</span>
-              <ArrowRight className="w-4 h-4" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/listings" className="btn-primary text-lg px-8 py-4">
+              Browse Marketplace
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link to="/create" className="btn-secondary">
-              Create Listing
+            <Link
+              to="/create"
+              className="px-8 py-4 bg-dark-850 hover:bg-dark-800 text-white font-semibold rounded-lg border-2 border-dark-700 hover:border-primary transition-all duration-200 flex items-center justify-center"
+            >
+              Sell Your Pets
             </Link>
           </div>
         </div>
