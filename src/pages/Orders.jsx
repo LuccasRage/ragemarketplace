@@ -1,83 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Clock, CheckCircle, AlertCircle, DollarSign } from 'lucide-react';
 import Badge from '../components/Badge';
 import { Link } from 'react-router-dom';
+import { ordersAPI } from '../services/api';
 
 const Orders = () => {
   const [activeTab, setActiveTab] = useState('purchases');
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState({});
 
-  const mockOrders = {
-    purchases: [
-      {
-        id: 1,
-        petName: 'Frost Dragon',
-        petCategory: 'Legendary',
-        age: 'Full Grown',
-        potion: 'Fly Ride',
-        rarity: 'Neon',
-        price: 500.00,
-        seller: {
-          username: 'DragonTrader99',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DragonTrader99',
-          robloxUsername: 'DragonTrader99',
-        },
-        status: 'DELIVERED',
-        createdAt: '2024-02-07T10:30:00Z',
-        sellerDeliveredAt: '2024-02-07T11:00:00Z',
-      },
-      {
-        id: 2,
-        petName: 'Shadow Dragon',
-        petCategory: 'Legendary',
-        age: 'Full Grown',
-        potion: 'Fly Ride',
-        rarity: 'Normal',
-        price: 150.00,
-        seller: {
-          username: 'NightWingTrader',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=NightWingTrader',
-          robloxUsername: 'NightWingTrader',
-        },
-        status: 'PENDING_DELIVERY',
-        createdAt: '2024-02-07T09:15:00Z',
-      },
-    ],
-    sales: [
-      {
-        id: 3,
-        petName: 'Parrot',
-        petCategory: 'Legendary',
-        age: 'Teen',
-        potion: 'Fly',
-        rarity: 'Normal',
-        price: 45.00,
-        buyer: {
-          username: 'FrostyTrades',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FrostyTrades',
-          robloxUsername: 'FrostyTrades',
-        },
-        status: 'PENDING_DELIVERY',
-        createdAt: '2024-02-06T14:20:00Z',
-      },
-      {
-        id: 4,
-        petName: 'Evil Unicorn',
-        petCategory: 'Legendary',
-        age: 'Full Grown',
-        potion: 'Fly Ride',
-        rarity: 'Normal',
-        price: 65.00,
-        buyer: {
-          username: 'SafariHunter',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SafariHunter',
-          robloxUsername: 'SafariHunter',
-        },
-        status: 'COMPLETED',
-        createdAt: '2024-02-05T16:45:00Z',
-        sellerDeliveredAt: '2024-02-05T17:00:00Z',
-        buyerConfirmedAt: '2024-02-05T17:30:00Z',
-      },
-    ],
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await ordersAPI.getMy();
+      setOrders(response.data);
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+      setError('Failed to load orders');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMarkDelivered = async (orderId) => {
+    setActionLoading({ ...actionLoading, [orderId]: true });
+    try {
+      await ordersAPI.markDelivered(orderId);
+      await fetchOrders();
+    } catch (err) {
+      console.error('Failed to mark delivered:', err);
+      alert(err.response?.data?.message || 'Failed to mark as delivered');
+    } finally {
+      setActionLoading({ ...actionLoading, [orderId]: false });
+    }
+  };
+
+  const handleConfirmReceipt = async (orderId) => {
+    setActionLoading({ ...actionLoading, [orderId]: true });
+    try {
+      await ordersAPI.confirmReceipt(orderId);
+      await fetchOrders();
+    } catch (err) {
+      console.error('Failed to confirm receipt:', err);
+      alert(err.response?.data?.message || 'Failed to confirm receipt');
+    } finally {
+      setActionLoading({ ...actionLoading, [orderId]: false });
+    }
+  };
+
+  const purchases = orders.filter(o => o.type === 'BUY' || !o.isSeller);
+  const sales = orders.filter(o => o.type === 'SELL' || o.isSeller);
   };
 
   const formatDate = (dateString) => {
@@ -118,16 +97,6 @@ const Orders = () => {
       default:
         return <Package className="w-5 h-5 text-gray-500" />;
     }
-  };
-
-  const handleMarkDelivered = (orderId) => {
-    console.log('Mark delivered:', orderId);
-    // API call would go here
-  };
-
-  const handleConfirmReceipt = (orderId) => {
-    console.log('Confirm receipt:', orderId);
-    // API call would go here
   };
 
   const handleOpenDispute = (orderId) => {
@@ -172,7 +141,16 @@ const Orders = () => {
         {/* Purchases Tab */}
         {activeTab === 'purchases' && (
           <div className="space-y-4">
-            {mockOrders.purchases.length === 0 ? (
+            {isLoading ? (
+              <div className="card p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+                <p className="text-gray-400 mt-4">Loading orders...</p>
+              </div>
+            ) : error ? (
+              <div className="card p-12 text-center">
+                <p className="text-red-400">{error}</p>
+              </div>
+            ) : purchases.length === 0 ? (
               <div className="card p-12 text-center">
                 <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">No purchases yet</h3>
@@ -182,7 +160,7 @@ const Orders = () => {
                 </Link>
               </div>
             ) : (
-              mockOrders.purchases.map((order) => (
+              purchases.map((order) => (
                 <div key={order.id} className="card p-6 hover:border-primary/50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Order Info */}
@@ -241,10 +219,11 @@ const Orders = () => {
                         <>
                           <button
                             onClick={() => handleConfirmReceipt(order.id)}
-                            className="btn-primary w-full"
+                            disabled={actionLoading[order.id]}
+                            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
-                            Confirm Received
+                            {actionLoading[order.id] ? 'Processing...' : 'Confirm Received'}
                           </button>
                           <button
                             onClick={() => handleOpenDispute(order.id)}
@@ -288,7 +267,16 @@ const Orders = () => {
         {/* Sales Tab */}
         {activeTab === 'sales' && (
           <div className="space-y-4">
-            {mockOrders.sales.length === 0 ? (
+            {isLoading ? (
+              <div className="card p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+                <p className="text-gray-400 mt-4">Loading orders...</p>
+              </div>
+            ) : error ? (
+              <div className="card p-12 text-center">
+                <p className="text-red-400">{error}</p>
+              </div>
+            ) : sales.length === 0 ? (
               <div className="card p-12 text-center">
                 <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">No sales yet</h3>
@@ -298,7 +286,7 @@ const Orders = () => {
                 </Link>
               </div>
             ) : (
-              mockOrders.sales.map((order) => (
+              sales.map((order) => (
                 <div key={order.id} className="card p-6 hover:border-primary/50 transition-colors">
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Order Info */}
@@ -364,10 +352,11 @@ const Orders = () => {
                         <>
                           <button
                             onClick={() => handleMarkDelivered(order.id)}
-                            className="btn-primary w-full"
+                            disabled={actionLoading[order.id]}
+                            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
-                            Mark Delivered
+                            {actionLoading[order.id] ? 'Processing...' : 'Mark Delivered'}
                           </button>
                           <button
                             onClick={() => handleOpenDispute(order.id)}
