@@ -1,0 +1,248 @@
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Eye, Heart, Clock, MessageCircle, Flag, Share2, ArrowLeft } from 'lucide-react';
+import Badge from '../components/Badge';
+import StarRating from '../components/StarRating';
+import { mockListings } from '../data/mockListings';
+import { mockUsers } from '../data/mockUsers';
+
+const ListingDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const listing = mockListings.find(l => l.id === parseInt(id));
+
+  if (!listing) {
+    return (
+      <div className="min-h-screen bg-dark-950 flex items-center justify-center">
+        <div className="card p-8 text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Listing Not Found</h2>
+          <p className="text-gray-400 mb-6">The listing you're looking for doesn't exist.</p>
+          <Link to="/listings" className="btn-primary">
+            Back to Listings
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const seller = mockUsers.find(u => u.id === listing.userId);
+
+  return (
+    <div className="min-h-screen bg-dark-950 py-8">
+      <div className="container mx-auto px-4 max-w-6xl">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back
+        </button>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Image and Actions */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Main Image */}
+            <div className="card p-6">
+              <div className="relative aspect-square bg-gradient-to-br from-dark-800 to-dark-850 rounded-lg overflow-hidden mb-4">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-32 h-32 mx-auto bg-primary/20 rounded-full flex items-center justify-center mb-4">
+                      <span className="text-7xl">🐾</span>
+                    </div>
+                    <p className="text-gray-500">Pet Image</p>
+                  </div>
+                </div>
+                
+                {listing.rarity !== 'Normal' && (
+                  <div className="absolute top-4 left-4">
+                    <Badge type="rarity" value={listing.rarity} />
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Contact Seller
+                </button>
+                <button className="px-4 py-3 bg-dark-900 text-gray-400 hover:text-white rounded-lg transition-colors">
+                  <Heart className="w-5 h-5" />
+                </button>
+                <button className="px-4 py-3 bg-dark-900 text-gray-400 hover:text-white rounded-lg transition-colors">
+                  <Share2 className="w-5 h-5" />
+                </button>
+                <button className="px-4 py-3 bg-dark-900 text-gray-400 hover:text-primary rounded-lg transition-colors">
+                  <Flag className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Details */}
+            <div className="card p-6">
+              <h1 className="text-3xl font-bold text-white mb-4">{listing.petName}</h1>
+              
+              <div className="flex flex-wrap gap-2 mb-6">
+                <Badge type="category" value={listing.category} />
+                <Badge type="age" value={listing.age} />
+                {listing.potion !== 'None' && (
+                  <Badge type="potion" value={listing.potion} />
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">
+                    Wants in Return
+                  </p>
+                  <p className="text-lg text-white">{listing.wantInReturn}</p>
+                </div>
+
+                <div className="flex items-center gap-6 text-sm text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    <span>{listing.views} views</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4" />
+                    <span>{listing.favorites} favorites</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Posted {formatDate(listing.datePosted)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Similar Listings */}
+            <div className="card p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Similar Listings</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {mockListings
+                  .filter(l => l.category === listing.category && l.id !== listing.id)
+                  .slice(0, 3)
+                  .map(similar => (
+                    <Link
+                      key={similar.id}
+                      to={`/listing/${similar.id}`}
+                      className="group"
+                    >
+                      <div className="aspect-square bg-gradient-to-br from-dark-800 to-dark-850 rounded-lg flex items-center justify-center mb-2 group-hover:ring-2 group-hover:ring-primary transition-all">
+                        <span className="text-4xl">🐾</span>
+                      </div>
+                      <p className="text-sm text-white font-medium truncate">
+                        {similar.petName}
+                      </p>
+                      <p className="text-xs text-gray-500">{similar.category}</p>
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Seller Info */}
+          <div className="space-y-6">
+            {/* Seller Card */}
+            <div className="card p-6">
+              <h2 className="text-lg font-bold text-white mb-4">Seller Information</h2>
+              
+              {seller && (
+                <div className="space-y-4">
+                  <Link
+                    to={`/profile/${seller.username}`}
+                    className="flex items-center gap-3 group"
+                  >
+                    <img
+                      src={seller.avatar}
+                      alt={seller.username}
+                      className="w-16 h-16 rounded-full ring-2 ring-dark-700 group-hover:ring-primary transition-all"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-medium group-hover:text-primary transition-colors">
+                          {seller.username}
+                        </p>
+                        {seller.verified && (
+                          <span className="text-primary text-xs">✓</span>
+                        )}
+                      </div>
+                      <StarRating rating={seller.reputation} size="sm" />
+                      <p className="text-xs text-gray-500">
+                        {seller.reviewCount} reviews
+                      </p>
+                    </div>
+                  </Link>
+
+                  <div className="pt-4 border-t border-dark-700 space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Active Listings</span>
+                      <span className="text-white">{seller.activeListings}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Completed Trades</span>
+                      <span className="text-white">{seller.completedTrades}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Member Since</span>
+                      <span className="text-white">
+                        {new Date(seller.joinDate).getFullYear()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {seller.bio && (
+                    <div className="pt-4 border-t border-dark-700">
+                      <p className="text-sm text-gray-400">{seller.bio}</p>
+                    </div>
+                  )}
+
+                  <Link
+                    to={`/profile/${seller.username}`}
+                    className="block w-full px-4 py-2 bg-dark-900 text-white text-center rounded-lg hover:bg-dark-800 transition-colors"
+                  >
+                    View Profile
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Trading Tips */}
+            <div className="card p-6">
+              <h2 className="text-lg font-bold text-white mb-4">Trading Tips</h2>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Always use middleman for high-value trades</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Check trader's reputation before trading</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Never share personal account information</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Report suspicious activity immediately</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ListingDetail;

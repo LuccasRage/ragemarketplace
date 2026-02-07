@@ -1,0 +1,223 @@
+import { Link, NavLink } from 'react-router-dom';
+import { Search, Menu, X, User, LogOut, Settings, Package } from 'lucide-react';
+import { useState } from 'react';
+
+const Navbar = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Mock auth state - would come from context/state management in real app
+  const isLoggedIn = true;
+  const currentUser = { username: "DragonTrader99", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=DragonTrader99" };
+
+  const navLinks = [
+    { to: '/', label: 'Home' },
+    { to: '/listings', label: 'Listings' },
+    { to: '/values', label: 'Values' },
+    { to: '/trades', label: 'Trades' },
+  ];
+
+  return (
+    <nav className="sticky top-0 z-50 bg-dark-900 border-b border-dark-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">R</span>
+            </div>
+            <span className="text-xl font-bold text-white group-hover:text-primary transition-colors">
+              Rage<span className="text-primary">Marketplace</span>
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'text-white bg-dark-850'
+                      : 'text-gray-400 hover:text-white hover:bg-dark-850'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
+
+          {/* Search Bar */}
+          <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search pets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-dark-850 border border-dark-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Right Side */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isLoggedIn ? (
+              <>
+                <Link
+                  to="/create"
+                  className="btn-primary text-sm"
+                >
+                  Create Listing
+                </Link>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                  >
+                    <img
+                      src={currentUser.avatar}
+                      alt={currentUser.username}
+                      className="w-8 h-8 rounded-full border-2 border-primary"
+                    />
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-dark-850 border border-dark-700 rounded-lg shadow-xl py-2">
+                      <Link
+                        to={`/profile/${currentUser.username}`}
+                        className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        <span className="text-sm">Profile</span>
+                      </Link>
+                      <Link
+                        to="/trades"
+                        className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Package className="w-4 h-4" />
+                        <span className="text-sm">My Trades</span>
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span className="text-sm">Settings</span>
+                      </Link>
+                      <hr className="my-2 border-dark-700" />
+                      <button className="flex items-center space-x-2 px-4 py-2 hover:bg-dark-800 transition-colors w-full text-left text-red-400">
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm">Logout</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <Link to="/login" className="btn-primary text-sm">
+                Login
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-dark-850 transition-colors"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-dark-700 bg-dark-900">
+          <div className="px-4 py-4 space-y-3">
+            {/* Mobile Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search pets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-dark-850 border border-dark-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500"
+              />
+            </div>
+
+            {/* Mobile Nav Links */}
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-white bg-dark-850'
+                      : 'text-gray-400 hover:text-white hover:bg-dark-850'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+
+            {isLoggedIn ? (
+              <>
+                <Link
+                  to="/create"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-2 bg-primary hover:bg-primary-600 text-white text-center font-medium rounded-lg transition-colors"
+                >
+                  Create Listing
+                </Link>
+                <Link
+                  to={`/profile/${currentUser.username}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg text-sm"
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg text-sm"
+                >
+                  Settings
+                </Link>
+                <button className="block w-full text-left px-4 py-2 text-red-400 hover:bg-dark-850 rounded-lg text-sm">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-2 bg-primary hover:bg-primary-600 text-white text-center font-medium rounded-lg transition-colors"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;
