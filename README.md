@@ -2,16 +2,18 @@
 
 ![RageMarketplace Banner](https://via.placeholder.com/1200x300/0a0a0a/e11d48?text=RageMarketplace)
 
-The most trusted marketplace for Roblox Adopt Me pet trading. Connect with verified traders, find fair deals, and build your dream collection.
+The most trusted marketplace for Roblox Adopt Me pet **buying and selling**. Secure transactions with our **escrow payment system**.
 
 ## 🚀 Features
 
 - **🔍 Advanced Search & Filters** - Find exactly what you're looking for with powerful filtering options
-- **📝 Easy Listing Creation** - List your pets in minutes with our intuitive form
-- **⭐ User Reputation System** - Trade with confidence using our rating system
-- **🛡️ Scam Protection** - Built-in reporting system and user verification
+- **📝 Easy Listing Creation** - List your pets for sale in minutes with our intuitive form
+- **💰 Escrow Payment System** - Secure buy/sell transactions with 7% platform fee
+- **⭐ User Reputation System** - Buy from trusted sellers with our rating system
+- **🛡️ Scam Protection** - Built-in dispute system and admin resolution
 - **📊 Live Value Guide** - Stay updated with the latest pet values and demand
-- **💬 Trade Management** - Track all your trades in one convenient dashboard
+- **💼 Order Management** - Track all your purchases and sales in one dashboard
+- **💳 Wallet System** - Manage your balance and transaction history
 - **🌙 Dark Theme** - Easy on the eyes with our sleek dark interface
 - **📱 Fully Responsive** - Works seamlessly on desktop, tablet, and mobile
 
@@ -26,13 +28,23 @@ RageMarketplace features a modern, gaming-inspired dark theme with:
 
 ## 🛠️ Tech Stack
 
+### Frontend
 - **React 19** - Modern React with hooks
-- **React Router v6** - Client-side routing
+- **React Router v7** - Client-side routing
 - **Tailwind CSS** - Utility-first styling
 - **Vite** - Lightning-fast build tool
 - **Lucide React** - Beautiful icon library
 
+### Backend
+- **Node.js + Express.js** - RESTful API
+- **PostgreSQL** - Relational database
+- **Prisma ORM** - Type-safe database access
+- **JWT** - Secure authentication
+- **bcrypt** - Password hashing
+
 ## 📦 Installation
+
+### Frontend
 
 1. Clone the repository:
 ```bash
@@ -52,11 +64,35 @@ npm run dev
 
 4. Open your browser and visit `http://localhost:5173`
 
+### Backend
+
+See [backend/README.md](backend/README.md) for complete backend setup instructions.
+
+Quick start:
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with your database credentials
+npm run prisma:migrate
+npm run prisma:seed
+npm run dev
+```
+
+The backend API will run on `http://localhost:5000`
+
 ## 🏗️ Build for Production
 
+### Frontend
 ```bash
 npm run build
 npm run preview
+```
+
+### Backend
+```bash
+cd backend
+npm start
 ```
 
 ## 📁 Project Structure
@@ -104,27 +140,56 @@ ragemarketplace/
 ## 🎯 Pages
 
 - **Home** (`/`) - Hero section, featured listings, how it works, stats
-- **Listings** (`/listings`) - Browse all pet listings with filters
-- **Create Listing** (`/create`) - Form to create new listings
+- **Marketplace** (`/listings`) - Browse all pet listings with filters
+- **Create Listing** (`/create`) - Form to create new listings with pricing
 - **Listing Detail** (`/listing/:id`) - Full details of a specific listing
-- **Profile** (`/profile/:username`) - User profile with listings and reviews
+- **Orders** (`/orders`) - Track purchases and sales with escrow status
+- **Wallet** (`/wallet`) - Manage balance, view transactions, deposit/withdraw
+- **Profile** (`/profile/:username`) - User profile with listings, reviews, and sales stats
 - **Login** (`/login`) - Authentication page
 - **Register** (`/register`) - New user registration
-- **Trades** (`/trades`) - Manage incoming, outgoing, and completed trades
-- **Reports** (`/reports`) - Report scams and view flagged users
+- **Reports** (`/reports`) - Report scams and view disputes
 - **Values** (`/values`) - Pet value guide with search and filters
 - **Settings** (`/settings`) - Account settings and preferences
 
+## 💡 How It Works
+
+### Buy/Sell Flow
+
+1. **Browse Marketplace** - Find pets you want to buy
+2. **Secure Purchase** - Buy with funds held in escrow
+3. **In-Game Delivery** - Seller delivers pet in Adopt Me
+4. **Confirm Receipt** - Release payment to seller (7% platform fee applied)
+5. **Leave Review** - Rate your experience
+
+### Escrow System
+
+- Buyer's funds are held securely in escrow
+- Seller delivers pet in-game
+- Buyer confirms receipt to release payment
+- Platform takes 7% fee, seller receives 93%
+- Disputes can be opened if issues arise
+- Admin resolves disputes fairly
+
+## 🔒 Security
+
+- JWT token authentication
+- bcrypt password hashing (10 rounds)
+- Atomic database transactions for money operations
+- Input validation on all endpoints
+- Role-based access control (USER, ADMIN, SUPPORT)
+- Escrow system prevents fraud
+
 ## 🔮 Future Enhancements
 
-- Backend API integration
+- Stripe & Cryptocurrency payment integration
 - Real-time messaging system
 - In-app notifications
 - Advanced analytics dashboard
 - Mobile app (React Native)
 - Multi-language support
 - Social features (following, favorites)
-- Trade history export
+- Transaction export
 
 ## 🤝 Contributing
 
@@ -142,7 +207,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⚠️ Disclaimer
 
-RageMarketplace is not affiliated with Roblox Corporation. Adopt Me is a trademark of Uplift Games. This is an independent fan project created to facilitate legitimate player-to-player trading.
+RageMarketplace is not affiliated with Roblox Corporation. Adopt Me is a trademark of Uplift Games. This is an independent platform created to facilitate legitimate player-to-player pet sales with secure escrow protection.
 
 ## 📧 Contact
 

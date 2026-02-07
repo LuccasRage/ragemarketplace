@@ -14,11 +14,19 @@ const CreateListing = () => {
     age: 'Newborn',
     potion: 'None',
     rarity: 'Normal',
-    wantInReturn: '',
+    price: '',
     description: ''
   });
 
   const [errors, setErrors] = useState({});
+
+  const PLATFORM_FEE_PERCENT = 7;
+
+  const calculateEarnings = (price) => {
+    const numPrice = parseFloat(price);
+    if (isNaN(numPrice) || numPrice <= 0) return 0;
+    return numPrice * (1 - PLATFORM_FEE_PERCENT / 100);
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -27,8 +35,12 @@ const CreateListing = () => {
       newErrors.petName = 'Pet name is required';
     }
     
-    if (!formData.wantInReturn.trim()) {
-      newErrors.wantInReturn = 'Please specify what you want in return';
+    if (!formData.price || isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
+      newErrors.price = 'Please enter a valid price greater than $0';
+    }
+
+    if (!formData.description.trim() || formData.description.length < 10) {
+      newErrors.description = 'Description must be at least 10 characters';
     }
     
     setErrors(newErrors);
@@ -57,7 +69,7 @@ const CreateListing = () => {
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Create New Listing</h1>
-          <p className="text-gray-400">List your pet for trading</p>
+          <p className="text-gray-400">List your pet for sale</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -152,39 +164,68 @@ const CreateListing = () => {
                 </select>
               </div>
 
-              {/* Want in Return */}
+              {/* Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Want in Return *
+                  Price (USD) *
                 </label>
-                <input
-                  type="text"
-                  name="wantInReturn"
-                  value={formData.wantInReturn}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 bg-dark-900 border ${
-                    errors.wantInReturn ? 'border-primary' : 'border-dark-700'
-                  } rounded-lg text-white focus:outline-none focus:border-primary transition-colors`}
-                  placeholder="e.g., NFR Frost Dragon or good offers"
-                />
-                {errors.wantInReturn && (
-                  <p className="text-primary text-sm mt-1">{errors.wantInReturn}</p>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    className={`w-full pl-8 pr-4 py-2 bg-dark-900 border ${
+                      errors.price ? 'border-primary' : 'border-dark-700'
+                    } rounded-lg text-white focus:outline-none focus:border-primary transition-colors`}
+                    placeholder="0.00"
+                  />
+                </div>
+                {errors.price && (
+                  <p className="text-primary text-sm mt-1">{errors.price}</p>
+                )}
+                {formData.price && parseFloat(formData.price) > 0 && (
+                  <div className="mt-2 p-3 bg-dark-850 border border-dark-700 rounded-lg">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-400">Sale Price:</span>
+                      <span className="text-white">${parseFloat(formData.price).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-400">Platform Fee ({PLATFORM_FEE_PERCENT}%):</span>
+                      <span className="text-red-400">-${(parseFloat(formData.price) * PLATFORM_FEE_PERCENT / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-semibold pt-2 border-t border-dark-700">
+                      <span className="text-primary">You'll Earn:</span>
+                      <span className="text-primary">${calculateEarnings(formData.price).toFixed(2)}</span>
+                    </div>
+                  </div>
                 )}
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Additional Description (Optional)
+                  Description *
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary transition-colors resize-none"
-                  placeholder="Any additional details about your pet..."
+                  className={`w-full px-4 py-2 bg-dark-900 border ${
+                    errors.description ? 'border-primary' : 'border-dark-700'
+                  } rounded-lg text-white focus:outline-none focus:border-primary transition-colors resize-none`}
+                  placeholder="Describe your pet's details, training, and any special features..."
                 />
+                {errors.description && (
+                  <p className="text-primary text-sm mt-1">{errors.description}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.description.length} / 500 characters
+                </p>
               </div>
 
               {/* Image Upload */}
@@ -257,21 +298,23 @@ const CreateListing = () => {
                     )}
                   </div>
 
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                      Wants in Return
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      {formData.wantInReturn || 'Not specified'}
-                    </p>
-                  </div>
+                  {formData.price && (
+                    <div className="pt-3 border-t border-dark-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-400 text-sm">Price</span>
+                        <span className="text-2xl font-bold text-primary">
+                          ${parseFloat(formData.price).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {formData.description && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                        Description
+                    <div className="pt-3 border-t border-dark-700">
+                      <h4 className="text-sm font-semibold text-gray-400 mb-2">Description</h4>
+                      <p className="text-sm text-gray-300 whitespace-pre-wrap">
+                        {formData.description || 'No description provided'}
                       </p>
-                      <p className="text-sm text-gray-300">{formData.description}</p>
                     </div>
                   )}
                 </div>
